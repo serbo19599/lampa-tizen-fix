@@ -15,30 +15,22 @@
                 e.preventDefault();
                 e.stopImmediatePropagation();
 
-                // Создаем компонент КАТАЛОГА (как в кинотеатрах)
-                Lampa.Component.add('my_recipes', function (object, exam) {
-                    var _this = this;
+                Lampa.Component.add('my_recipes_final', function (object, exam) {
                     var scroll = new Lampa.Scroll({mask:true, over:true});
-                    var items = [];
                     var html = $('<div></div>');
                     
                     this.create = function () {
-                        // Создаем тестовую плитку рецепта
+                        // Используем пустую карточку БЕЗ внешних ссылок
                         var card = Lampa.Template.get('card', {
-                            title: 'Тестовый рецепт',
+                            title: 'Чистый тест',
                             release_date: '2026'
                         });
 
                         card.addClass('card--full');
-                        card.find('.card__img').attr('src', 'https://www.russianfood.com/recipes/pic/prev/p119475.jpg');
+                        // НИКАКИХ ссылок на russianfood здесь нет
                         
-                        card.on('hover:enter', function () {
-                            Lampa.Noty.show('Нажали ОК на рецепте!');
-                        });
-
                         html.append(scroll.render());
                         scroll.append(card);
-                        
                         return html;
                     };
 
@@ -49,23 +41,17 @@
                                 Lampa.Controller.collectionSet(scroll.render());
                                 Lampa.Controller.navigate();
                             },
-                            back: function () {
-                                Lampa.Activity.backward();
-                            }
+                            back: function () { Lampa.Activity.backward(); }
                         });
                         Lampa.Controller.toggle('content');
                     };
                     this.back = function () { Lampa.Activity.backward(); };
-                    this.pause = function () {};
-                    this.stop = function () {};
                     this.destroy = function () {};
                 });
 
-                // Запускаем как внутреннюю активность
                 Lampa.Activity.push({
-                    title: 'Каталог рецептов',
-                    component: 'my_recipes',
-                    page: 1
+                    title: 'Проверка изоляции',
+                    component: 'my_recipes_final'
                 });
                 
                 return false;
