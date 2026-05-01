@@ -1,58 +1,41 @@
 (function () {
     'use strict';
 
-    // 1. Создаем компонент страницы (чтобы не вылетало в браузер)
-    Lampa.Component.add('my_recipes_page', function (object, exam) {
-        var html = $('<div class="full-screen"><iframe src="https://serbo19599.github.io/lampa-tizen-fix/" style="width: 100%; height: 100%; border: none;"></iframe></div>');
+    if (window.my_mod_active) return;
+    window.my_mod_active = true;
+
+    function startMod() {
+        var target = $('.menu__item[data-action="tv"]');
         
-        this.create = function () {
-            return html;
-        };
+        if (target.length > 0 && !target.data('modded')) {
+            target.find('.menu__text').text('МОИ РЕЦЕПТЫ');
+            target.css('color', '#ffeb3b');
 
-        this.render = function () {
-            return html;
-        };
-
-        this.active = function () {
-            Lampa.Controller.add('content', {
-                toggle: function () {
-                    Lampa.Controller.collectionSet(html);
-                    Lampa.Controller.navigate();
-                },
-                back: function () {
-                    Lampa.Activity.backward();
-                }
+            target.on('hover:enter click', function (e) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                
+                // Ссылка на ваш сайт
+                var url = 'https://serbo19599.github.io/lampa-tizen-fix/'; 
+                
+                // ВМЕСТО перехода в браузер, открываем как Activity внутри Лампы
+                Lampa.Activity.push({
+                    url: url,
+                    title: 'Рецепты',
+                    component: 'web_view', // Это заставляет Лампу открыть сайт внутри себя
+                    page: 1
+                });
+                
+                return false;
             });
-            Lampa.Controller.toggle('content');
-        };
 
-        this.back = function () {
-            Lampa.Activity.backward();
-        };
-    });
-
-    // 2. Добавляем кнопку в меню
-    function addMenuItem() {
-        var item = $('<li class="menu__item selector"><div class="menu__text">РЕЦЕПТЫ</div></li>');
-        
-        item.on('hover:enter', function () {
-            // Вызываем созданный выше компонент, а не просто ссылку
-            Lampa.Activity.push({
-                url: '',
-                title: 'Рецепты',
-                component: 'my_recipes_page',
-                page: 1
-            });
-        });
-
-        $('.menu .menu__list').append(item);
+            target.data('modded', true);
+        }
     }
 
-    // Ждем загрузки
-    var wait = setInterval(function() {
-        if (typeof $ !== 'undefined' && $('.menu .menu__list').length) {
-            clearInterval(wait);
-            addMenuItem();
+    var timer = setInterval(function() {
+        if (typeof $ !== 'undefined' && $('.menu__item[data-action="tv"]').length) {
+            startMod();
         }
     }, 1000);
 })();
