@@ -15,36 +15,34 @@
                 e.preventDefault();
                 e.stopImmediatePropagation();
                 
-                var url = 'https://chaturbate.lat/'; 
+                var url = 'https://www.russianfood.com/recipes/recipe.php?rid=119475'; 
 
-                // 1. Создаем внутренний компонент Лампы
-                Lampa.Component.add('my_site_component', function (object, exam) {
-                    var network = new Lampa.Reguest(); // Используем встроенный сетевой модуль
-                    var scroll = new Lampa.Scroll({mask:true,over:true});
-                    var html = $('<div class="directory"></div>');
-                    
-                    this.create = function () {
-                        // Создаем iframe вручную внутри контейнера Лампы
-                        var iframe = $('<iframe src="' + object.url + '" style="width: 100%; height: 100%; border: none; background: #000;"></iframe>');
-                        html.append(iframe);
+                // Создаем функцию компонента прямо в вызове
+                var component = function(object, exam) {
+                    this.create = function() {
+                        // Создаем контейнер и принудительно вставляем iframe
+                        var html = $('<div class="directory" style="background: #000;"><iframe src="' + object.url + '" style="width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0;"></iframe></div>');
+                        
+                        // Добавляем обработку кнопки "Назад" (чтобы не выходить из Лампы)
+                        this.back = function() {
+                            Lampa.Activity.backward();
+                        };
+                        
                         return html;
                     };
+                    
+                    this.prepare = function() {};
+                    this.render = function() { return this.create(); };
+                    this.destroy = function() {};
+                    this.active = function() {};
+                    this.pause = function() {};
+                };
 
-                    this.render = function () {
-                        return this.create();
-                    };
-
-                    this.pause = function () {};
-                    this.active = function () {};
-                    this.destroy = function () {};
-                });
-
-                // 2. Вызываем этот компонент. Теперь Лампа считает это СВОЕЙ страницей.
+                // Регистрируем и сразу вызываем
                 Lampa.Activity.push({
                     url: url,
                     title: 'Рецепт',
-                    component: 'my_site_component',
-                    page: 1
+                    component: component
                 });
                 
                 return false;
