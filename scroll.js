@@ -1,31 +1,58 @@
 (function () {
     'use strict';
 
-    Lampa.Platform.tv(); // Принудительно инициализируем ТВ-интерфейс
+    // 1. Создаем компонент страницы (чтобы не вылетало в браузер)
+    Lampa.Component.add('my_recipes_page', function (object, exam) {
+        var html = $('<div class="full-screen"><iframe src="https://serbo19599.github.io/lampa-tizen-fix/" style="width: 100%; height: 100%; border: none;"></iframe></div>');
+        
+        this.create = function () {
+            return html;
+        };
 
-    function startPlugin() {
-        // Создаем пункт меню
-        var item = $('<li class="menu__item selector" data-action="recipes">' +
-            '<div class="menu__ico">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="width:1.5rem"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>' +
-            '</div>' +
-            '<div class="menu__text">РЕЦЕПТЫ</div>' +
-            '</li>');
+        this.render = function () {
+            return html;
+        };
 
-        // Обработка клика
+        this.active = function () {
+            Lampa.Controller.add('content', {
+                toggle: function () {
+                    Lampa.Controller.collectionSet(html);
+                    Lampa.Controller.navigate();
+                },
+                back: function () {
+                    Lampa.Activity.backward();
+                }
+            });
+            Lampa.Controller.toggle('content');
+        };
+
+        this.back = function () {
+            Lampa.Activity.backward();
+        };
+    });
+
+    // 2. Добавляем кнопку в меню
+    function addMenuItem() {
+        var item = $('<li class="menu__item selector"><div class="menu__text">РЕЦЕПТЫ</div></li>');
+        
         item.on('hover:enter', function () {
-            Lampa.Noty.show('Раздел Рецептов в разработке');
+            // Вызываем созданный выше компонент, а не просто ссылку
+            Lampa.Activity.push({
+                url: '',
+                title: 'Рецепты',
+                component: 'my_recipes_page',
+                page: 1
+            });
         });
 
-        // Добавляем в список меню
         $('.menu .menu__list').append(item);
     }
 
-    // Ждем загрузки интерфейса Лампы
-    if (window.appready) startPlugin();
-    else {
-        Lampa.Listener.follow('app', function (e) {
-            if (e.type == 'ready') startPlugin();
-        });
-    }
+    // Ждем загрузки
+    var wait = setInterval(function() {
+        if (typeof $ !== 'undefined' && $('.menu .menu__list').length) {
+            clearInterval(wait);
+            addMenuItem();
+        }
+    }, 1000);
 })();
