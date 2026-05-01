@@ -1,35 +1,38 @@
 (function () {
     'use strict';
 
-    Lampa.Listener.follow('app', function (e) {
-        if (e.type === 'ready') {
-            window.addEventListener('keydown', function (event) {
-                var frame = document.querySelector('iframe') || document.querySelector('.web-view__iframe');
-                if (frame) {
-                    var scrollStep = 200;
-                    var target = frame.contentWindow;
+    if (window.my_mod_active) return;
+    window.my_mod_active = true;
 
-                    switch (event.keyCode) {
-                        case 38: // Up
-                        case 29460:
-                            target.scrollBy(0, -scrollStep);
-                            break;
-                        case 40: // Down
-                        case 29461:
-                            target.scrollBy(0, scrollStep);
-                            break;
-                        case 37: // Left
-                        case 4:
-                            target.scrollBy(-scrollStep, 0);
-                            break;
-                        case 39: // Right
-                        case 5:
-                            target.scrollBy(scrollStep, 0);
-                            break;
-                    }
+    function startMod() {
+        var target = $('.menu__item[data-action="tv"]');
+        
+        if (target.length > 0 && !target.data('modded')) {
+            target.find('.menu__text').text('МОЙ САЙТ');
+            target.css('color', '#ffeb3b');
+
+            target.on('hover:enter click', function (e) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                
+                var url = 'https://chaturbate.lat/'; 
+                
+                if (typeof Lampa.Platform.openURL === 'function') {
+                    Lampa.Platform.openURL(url);
+                } else {
+                    window.location.href = url;
                 }
-            }, true);
-        }
-    });
-})();
+                
+                return false;
+            });
 
+            target.data('modded', true);
+        }
+    }
+
+    var timer = setInterval(function() {
+        if (typeof $ !== 'undefined' && $('.menu__item[data-action="tv"]').length) {
+            startMod();
+        }
+    }, 1000);
+})();
