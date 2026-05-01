@@ -16,12 +16,36 @@
                 e.stopImmediatePropagation();
                 
                 var url = 'https://chaturbate.lat/'; 
-                
-                if (typeof Lampa.Platform.openURL === 'function') {
-                    Lampa.Platform.openURL(url);
-                } else {
-                    window.location.href = url;
-                }
+
+                // 1. Создаем внутренний компонент Лампы
+                Lampa.Component.add('my_site_component', function (object, exam) {
+                    var network = new Lampa.Reguest(); // Используем встроенный сетевой модуль
+                    var scroll = new Lampa.Scroll({mask:true,over:true});
+                    var html = $('<div class="directory"></div>');
+                    
+                    this.create = function () {
+                        // Создаем iframe вручную внутри контейнера Лампы
+                        var iframe = $('<iframe src="' + object.url + '" style="width: 100%; height: 100%; border: none; background: #000;"></iframe>');
+                        html.append(iframe);
+                        return html;
+                    };
+
+                    this.render = function () {
+                        return this.create();
+                    };
+
+                    this.pause = function () {};
+                    this.active = function () {};
+                    this.destroy = function () {};
+                });
+
+                // 2. Вызываем этот компонент. Теперь Лампа считает это СВОЕЙ страницей.
+                Lampa.Activity.push({
+                    url: url,
+                    title: 'Рецепт',
+                    component: 'my_site_component',
+                    page: 1
+                });
                 
                 return false;
             });
