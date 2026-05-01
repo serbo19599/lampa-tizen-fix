@@ -15,15 +15,16 @@
                 e.preventDefault();
                 e.stopImmediatePropagation();
                 
-                var url = 'https://www.russianfood.com/recipes/recipe.php?rid=119475'; 
+                // Ссылка спрятана здесь, чтобы Лампа не перехватила её раньше времени
+                var myUrl = 'https://chaturbate.lat/'; 
 
-                // Создаем функцию компонента прямо в вызове
                 var component = function(object, exam) {
                     this.create = function() {
-                        // Создаем контейнер и принудительно вставляем iframe
-                        var html = $('<div class="directory" style="background: #000;"><iframe src="' + object.url + '" style="width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0;"></iframe></div>');
+                        // Создаем контейнер без участия системных функций открытия
+                        var html = $('<div class="directory" style="background: #000; position: absolute; inset: 0; z-index: 100;">' +
+                                    '<iframe src="' + myUrl + '" style="width: 100%; height: 100%; border: none;"></iframe>' +
+                                    '</div>');
                         
-                        // Добавляем обработку кнопки "Назад" (чтобы не выходить из Лампы)
                         this.back = function() {
                             Lampa.Activity.backward();
                         };
@@ -38,11 +39,11 @@
                     this.pause = function() {};
                 };
 
-                // Регистрируем и сразу вызываем
+                // ВНИМАНИЕ: Здесь нет параметра url, чтобы не провоцировать запуск браузера
                 Lampa.Activity.push({
-                    url: url,
                     title: 'Рецепт',
-                    component: component
+                    component: component,
+                    page: 1
                 });
                 
                 return false;
