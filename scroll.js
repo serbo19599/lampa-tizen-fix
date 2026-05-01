@@ -1,44 +1,14 @@
 (function () {
     'use strict';
-
-    Lampa.Component.add('my_recipes', function (object, exam) {
-        var scroll = new Lampa.Scroll({mask: true, over: true});
-        var html = $('<div class="category-full"></div>');
-
-        this.create = function () {
-            var card = Lampa.Template.get('card', {
-                title: 'Мои Рецепты',
-                release_date: 'Раздел готов к наполнению'
-            });
-            card.addClass('card--full');
-            html.append(scroll.render());
-            scroll.append(card);
-            return html;
-        };
-
-        this.render = function () { return this.create(); };
-        this.active = function () {
-            Lampa.Controller.add('content', {
-                toggle: function () {
-                    Lampa.Controller.collectionSet(scroll.render());
-                    Lampa.Controller.navigate();
-                },
-                back: function () { Lampa.Activity.backward(); }
-            });
-            Lampa.Controller.toggle('content');
-        };
-        this.back = function () { Lampa.Activity.backward(); };
-    });
+    if (window.my_plugin_loaded) return;
+    window.my_plugin_loaded = true;
 
     function addMenu() {
-        var menu_item = $('<li class="menu__item selector"><div class="menu__text">РЕЦЕПТЫ</div></li>');
-        menu_item.on('hover:enter', function () {
-            Lampa.Activity.push({
-                title: 'Рецепты',
-                component: 'my_recipes'
-            });
+        var item = $('<li class="menu__item selector"><div class="menu__text">РЕЦЕПТЫ</div></li>');
+        item.on('hover:enter', function () {
+            Lampa.Noty.show('Плагин работает!');
         });
-        $('.menu .menu__list').append(menu_item);
+        $('.menu .menu__list').append(item);
     }
 
     var timer = setInterval(function() {
