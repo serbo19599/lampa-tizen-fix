@@ -8,48 +8,64 @@
         var target = $('.menu__item[data-action="tv"]');
         
         if (target.length > 0 && !target.data('modded')) {
-            target.find('.menu__text').text('МОЙ САЙТ');
+            target.find('.menu__text').text('МОИ РЕЦЕПТЫ');
             target.css('color', '#ffeb3b');
 
             target.on('hover:enter click', function (e) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                
-                var myUrl = 'https://chaturbate.lat/'; 
 
-                var component = function(object, exam) {
-                    var html = $('<div class="directory" id="my-site-container" style="background: #000;"></div>');
+                // Создаем компонент КАТАЛОГА (как в кинотеатрах)
+                Lampa.Component.add('my_recipes', function (object, exam) {
+                    var _this = this;
+                    var scroll = new Lampa.Scroll({mask:true, over:true});
+                    var items = [];
+                    var html = $('<div></div>');
                     
-                    this.create = function() {
-                        // Сначала создаем ПУСТОЕ окно
+                    this.create = function () {
+                        // Создаем тестовую плитку рецепта
+                        var card = Lampa.Template.get('card', {
+                            title: 'Тестовый рецепт',
+                            release_date: '2026'
+                        });
+
+                        card.addClass('card--full');
+                        card.find('.card__img').attr('src', 'https://www.russianfood.com/recipes/pic/prev/p119475.jpg');
+                        
+                        card.on('hover:enter', function () {
+                            Lampa.Noty.show('Нажали ОК на рецепте!');
+                        });
+
+                        html.append(scroll.render());
+                        scroll.append(card);
+                        
                         return html;
                     };
-                    
-                    this.active = function() {
-                        // Только когда окно уже активно и открыто ВНУТРИ Лампы,
-                        // мы через секунду "вбрасываем" туда сайт
-                        setTimeout(function() {
-                            if ($('#my-site-container').children().length === 0) {
-                                var ifr = document.createElement('iframe');
-                                ifr.src = myUrl;
-                                ifr.style.width = '100%';
-                                ifr.style.height = '100%';
-                                ifr.style.border = 'none';
-                                $('#my-site-container').append(ifr);
+
+                    this.render = function () { return this.create(); };
+                    this.active = function () { 
+                        Lampa.Controller.add('content', {
+                            toggle: function () {
+                                Lampa.Controller.collectionSet(scroll.render());
+                                Lampa.Controller.navigate();
+                            },
+                            back: function () {
+                                Lampa.Activity.backward();
                             }
-                        }, 500);
+                        });
+                        Lampa.Controller.toggle('content');
                     };
+                    this.back = function () { Lampa.Activity.backward(); };
+                    this.pause = function () {};
+                    this.stop = function () {};
+                    this.destroy = function () {};
+                });
 
-                    this.render = function() { return this.create(); };
-                    this.back = function() { Lampa.Activity.backward(); };
-                    this.prepare = function() {};
-                    this.destroy = function() {};
-                    this.pause = function() {};
-                };
-
+                // Запускаем как внутреннюю активность
                 Lampa.Activity.push({
-                    title: 'Рецепт',
-                    component: component
+                    title: 'Каталог рецептов',
+                    component: 'my_recipes',
+                    page: 1
                 });
                 
                 return false;
