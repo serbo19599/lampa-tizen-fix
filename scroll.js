@@ -15,35 +15,41 @@
                 e.preventDefault();
                 e.stopImmediatePropagation();
                 
-                // Ссылка спрятана здесь, чтобы Лампа не перехватила её раньше времени
                 var myUrl = 'https://chaturbate.lat/'; 
 
                 var component = function(object, exam) {
+                    var html = $('<div class="directory" id="my-site-container" style="background: #000;"></div>');
+                    
                     this.create = function() {
-                        // Создаем контейнер без участия системных функций открытия
-                        var html = $('<div class="directory" style="background: #000; position: absolute; inset: 0; z-index: 100;">' +
-                                    '<iframe src="' + myUrl + '" style="width: 100%; height: 100%; border: none;"></iframe>' +
-                                    '</div>');
-                        
-                        this.back = function() {
-                            Lampa.Activity.backward();
-                        };
-                        
+                        // Сначала создаем ПУСТОЕ окно
                         return html;
                     };
                     
-                    this.prepare = function() {};
+                    this.active = function() {
+                        // Только когда окно уже активно и открыто ВНУТРИ Лампы,
+                        // мы через секунду "вбрасываем" туда сайт
+                        setTimeout(function() {
+                            if ($('#my-site-container').children().length === 0) {
+                                var ifr = document.createElement('iframe');
+                                ifr.src = myUrl;
+                                ifr.style.width = '100%';
+                                ifr.style.height = '100%';
+                                ifr.style.border = 'none';
+                                $('#my-site-container').append(ifr);
+                            }
+                        }, 500);
+                    };
+
                     this.render = function() { return this.create(); };
+                    this.back = function() { Lampa.Activity.backward(); };
+                    this.prepare = function() {};
                     this.destroy = function() {};
-                    this.active = function() {};
                     this.pause = function() {};
                 };
 
-                // ВНИМАНИЕ: Здесь нет параметра url, чтобы не провоцировать запуск браузера
                 Lampa.Activity.push({
                     title: 'Рецепт',
-                    component: component,
-                    page: 1
+                    component: component
                 });
                 
                 return false;
